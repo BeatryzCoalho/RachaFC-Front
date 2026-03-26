@@ -1,58 +1,64 @@
-// import LoginForm from '~/components/login/login-form';
-// import { useEffect, useState } from 'react';
-// import { useAuthStore } from '~/stores/authStore';
-// import { useNavigate } from 'react-router';
 
-export default function LoginPage() {}
-//   const [isDarkMode, setIsDarkMode] = useState(false);
-//   // const { checkAuth } = useAuthStore();
-//   const navigate = useNavigate();
+import { useEffect, useState } from 'react';
 
-//   useEffect(() => {
-//     const matchDark = window.matchMedia('(prefers-color-scheme: dark)');
-//     setIsDarkMode(matchDark.matches);
+import { useNavigate } from 'react-router';
+// import LoginForm from '../componentes/Login/login-form';
+import { useAuthStore } from '../stores/authStore';
 
-//     const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+export default function LoginPage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
 
-//     matchDark.addEventListener('change', handleChange);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
 
-//     const handleSessionCheck = async () => {
-//       await checkAuth();
+  // 🌙 dark mode (opcional)
+  useEffect(() => {
+    const matchDark = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(matchDark.matches);
 
-//       if (useAuthStore.getState().isAuthenticated) {
-//         const nextParam = new URLSearchParams(window.location.search).get('next') || '/home';
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    matchDark.addEventListener('change', handleChange);
 
-//         navigate(nextParam, { replace: true });
-//       }
-//     };
+    return () => matchDark.removeEventListener('change', handleChange);
+  }, []);
 
-//     handleSessionCheck();
+  // 🔐 verifica sessão ao entrar
+  useEffect(() => {
+  const run = async () => {
+    await checkAuth();
 
-//     return () => matchDark.removeEventListener('change', handleChange);
-//   }, [checkAuth, navigate]);
+    const isAuth = useAuthStore.getState().isAuthenticated;
 
-//   return (
-//     <div className="relative h-screen flex ">
-//       <div
-//         className={`absolute left-0 top-0 bottom-0 z-10 flex flex-col justify-center p-10 shadow-lg items-center gap-5 ${
-//           isDarkMode ? 'bg-[#2B2B2B]' : 'bg-gray-100'
-//         }`}
-//         style={{
-//           width: '52%',
-//           borderTopRightRadius: '30px',
-//           borderBottomRightRadius: '30px',
-//         }}
-//       >
-//         <LoginForm />
-//       </div>
-//       <div className="flex-1 relative flex justify-end items-end object-contain">
-//         {/* eslint-disable-next-line @next/next/no-img-element */}
-//         <img
-//           src={isDarkMode ? '/public/images/floki-dark.png' : '/public/images/Login-floki.jpeg'}
-//           alt="Imagem de dragão"
-//           className="w-[50%] h-[100%] "
-//         />
-//       </div>
-//     </div>
-//   );
-// }
+    if (isAuth) {
+      const next =
+        new URLSearchParams(window.location.search).get('next') || '/home';
+
+      navigate(next, { replace: true });
+    }
+  };
+
+  run();
+}, [checkAuth, navigate]);
+
+  return (
+    <div className="h-screen flex">
+      {/* esquerda */}
+      <div
+        className={`flex flex-col justify-center items-center p-8 w-full md:w-1/2 ${
+          isDarkMode ? 'bg-[#2B2B2B]' : 'bg-gray-100'
+        }`}
+      >
+        <div>teste</div>
+      </div>
+
+      {/* direita (imagem) */}
+      <div className="hidden md:flex flex-1 justify-center items-center bg-black">
+        <img
+          src={isDarkMode ? '/images/racha-dark.png' : '/images/racha-light.png'}
+          alt="Login"
+          className="max-w-[80%] h-auto"
+        />
+      </div>
+    </div>
+  );
+}

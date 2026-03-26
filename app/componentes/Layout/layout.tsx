@@ -11,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     : theme.colors["ice-white"][0];
 
   const pathname = window.location.pathname;
-  const isLoginPage = pathname.includes("/login");
+  const isLoginPage = pathname === "/";
 
   if (isLoginPage) {
     return <div className="h-screen">{children}</div>;
